@@ -16,20 +16,22 @@ function clean_arr($val){
 	return array_unique(array_filter($val));
 }
 
-function search_node($addr, $ips = '', $port = 7903){
+function search_node($addr, $ip_check = null, $ips = '', $port = 7903){
 	global $ctx;
 	foreach($addr as $key => $value){
-		if(inet_pton($value) === FALSE) continue;
+		if($ip_check != null){
+			if(@inet_pton($value) === FALSE) continue;
+		}
 		$ips = remove_ip(@file_get_contents("http://$value:$port/peer_addresses", 0, $ctx))." ".$ips;
 	}
 	return $ips;
 }
 
-$ctx = stream_context_create(array('http' => array('timeout' => 1)));
+$ctx = stream_context_create(array('http' => array('timeout' => 3)));
 $list = 'p2pool.dashninja.pl dash.p2pools.us eu.p2pool.pl p2pool.crunchpool.com happymining.de';
 $addr = explode(' ', $list);
 $addr = clean_arr(explode(' ', search_node($addr))); // first
-$addr = clean_arr(explode(' ', search_node($addr))); // all
+$addr = clean_arr(explode(' ', search_node($addr, 'check'))); // all
 
 $table = '';
 foreach($addr as $key => $value){
