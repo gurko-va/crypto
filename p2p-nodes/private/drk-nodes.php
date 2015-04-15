@@ -19,6 +19,7 @@ function clean_arr($val){
 function search_node($addr, $ips = '', $port = 7903){
 	global $ctx;
 	foreach($addr as $key => $value){
+		if(inet_pton($value) === FALSE) continue;
 		$ips = remove_ip(@file_get_contents("http://$value:$port/peer_addresses", 0, $ctx))." ".$ips;
 	}
 	return $ips;
@@ -41,6 +42,8 @@ foreach($addr as $key => $value){
 	}else{
 		$sum = 0;
 	}
+	
+	if(!is_numeric($sum) || !is_numeric($uptime)) continue;
 	
 	$query_select = $db->prepare("SELECT * FROM `node` WHERE `ip` = :ip");
 	$query_select->bindParam(':ip', $value, PDO::PARAM_STR);
@@ -71,4 +74,3 @@ while($row=$query->fetch()){
 		$query_delete->execute();
 	}
 }
-?>
