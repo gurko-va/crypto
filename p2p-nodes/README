@@ -1,5 +1,3 @@
 example => http://p2pool.pl/dash-p2p.php
 add in cron
-```
 */10 * * * * user php /var/www/drk-nodes.php
-```
